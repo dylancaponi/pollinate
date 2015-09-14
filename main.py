@@ -7,6 +7,7 @@ from boto.s3.key import Key
 connect_retry_time = 5
 oldfile = ""
 
+
 # store AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY in ~/.aws/credentials
 s3 = boto.connect_s3()
 # check if bucket exists, if not then create
@@ -35,16 +36,20 @@ def get_serial_port():
 def collect_upload(ser):
 	global oldfile
 	global k
+	cleanup = 0
 	num_writes = 0
 	num_write_upload_threshold = 10
 	while(1):
 
 		# update filename, won't change if same day as last write
 		# fix - write to usb directory
-		newfile = strftime("%Y-%m-%d") + ".csv"
+		newfile = strftime("%Y-%m-%d") + ".csv" # add a minute to test
 		if newfile != oldfile:
 			print 'creating new file: ' + newfile
+			deletefile = oldfile
+			cleanup = 1
 			oldfile = newfile
+
 
 		data = ser.readline()
 		#print data
@@ -70,6 +75,14 @@ def collect_upload(ser):
 			all_data_from_file = ""
 
 			num_writes = 0
+
+			if cleanup == 1 and deletefile != "":
+				# try to delete old file to save space only after uploading to S3
+				# fix - add a check that upload was successful
+				print 'deleting old file:' + deletefile
+				os.remove(deletefile)
+				cleanup = 0
+				
 
 		num_writes += 1
 
