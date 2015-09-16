@@ -66,7 +66,7 @@ def collect_upload(ser):
 		if num_writes == num_write_upload_threshold:
 			# write to aws
 			print 'uploading to aws'
-			k.key = '/data/weight/' + newfile
+			k.key = '/data/count/' + newfile
 
 			# get all the data from file
 			with open(newfile, 'r') as f:
