@@ -1,3 +1,4 @@
 # pollinate
 
 crontab test
+auto
