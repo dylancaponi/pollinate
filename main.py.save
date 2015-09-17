@@ -15,6 +15,11 @@ print "connecting to aws"
 startTime = time.time()
 s3 = boto.connect_s3()
 print startTime
+print endTime
+print endTime - startTime
+if endTime - startTime > 30:
+	print 'it was bigger'
+	os._exit()
 #sleep(connect_retry_time)
 
 
@@ -24,13 +29,10 @@ if s3.lookup(bucket_name):
 	print bucket_name + " already exists"
 	bucket = s3.lookup(bucket_name)
 else:
-	endTime = time.time()
-	if endTime - startTime > 30:
-		print 'it was bigger'
-		os._exit()
 	# fix - this could fail if someone else owns bucket
 	print "creating new bucket with name: " + bucket_name
 	bucket = s3.create_bucket(bucket_name)
+
 
 k = Key(bucket)
 
@@ -50,7 +52,7 @@ def collect_upload(ser):
 	global k
 	cleanup = 0
 	num_writes = 0
-	num_write_upload_threshold = 50
+	num_write_upload_threshold = 10
 	while(1):
 
 		# update filename, won't change if same day as last write
