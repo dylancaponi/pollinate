@@ -61,10 +61,13 @@ def write_file_to_s3(filename):
 	k.key = '/data/count/' + filename
 
 	# get all the data from file
-	with open(filename, 'r') as f:
-		all_data_from_file = f.read()
-	print 'write', filename, 'to s3'
-	k.set_contents_from_string(all_data_from_file)
+	try:
+		with open(filename, 'r') as f:
+			all_data_from_file = f.read()
+			print 'write', filename, 'to s3'
+			k.set_contents_from_string(all_data_from_file)
+	except IOError as e:
+		print e
 
 def get_minute():
 	return strftime('%M')
@@ -77,8 +80,6 @@ bucket_name = 'wenis'
 connect_retry_time = 5
 last_minute = get_minute()
 last_date = get_date() 
-# FOR TESTING - REMOVE
-last_date = "2016-01-30"
 filename = None
 ser = None
 
@@ -96,11 +97,12 @@ while True:
 	else:
 		ser = connect_to_serial_port()
 		time.sleep(1)
-
+ 
 	# Execute daily tasks
 	date_now = get_date()
 	if date_now != last_date:
 		print 'day:',date_now
+		print 'write to AWS in thread'
 		thread.start_new_thread(write_file_to_s3,(last_date,))
 		last_date = date_now
 
@@ -109,6 +111,7 @@ while True:
 	if minute_now != last_minute:
 		print 'minute:',minute_now
 		print 'write to mysql in thread'
+
 		last_minute = minute_now
 
 	
