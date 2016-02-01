@@ -83,6 +83,8 @@ def collect_upload(ser):
 			# get all the data from file
 			with open(newfile, 'r') as f:
 				all_data_from_file = f.read()
+
+			# fix - try to set contents, except - reconnect to aws
 			k.set_contents_from_string(all_data_from_file)
 			all_data_from_file = ""
 
